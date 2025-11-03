@@ -1,8 +1,7 @@
 // controllers/auth.controller.js
 import crypto from "crypto";
 import _ from "lodash";
-import { AdminSchema } from "../models/models_import.js";
-import { ResetPasswordSchema } from "../models/models_import.js"; // ✅ Create this model
+import { AdminSchema, ResetPasswordSchema } from "../models/models_import.js";
 import {
   comparePassword,
   generateToken,
@@ -25,7 +24,7 @@ import { sendMail } from "../helpers/mail.helper.js";
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://mecatrone.com";
 
 /* ======================================================
-   🔹 LOGIN CONTROLLER
+   🔹 LOGIN
    ====================================================== */
 export const login = async (req, res) => {
   try {
@@ -33,7 +32,7 @@ export const login = async (req, res) => {
     if (!email || !password)
       return errorResponse(res, "Email and password are required", 400);
 
-    const user = await AdminSchema.findOne({ email }).lean();
+    const user = await AdminSchema.findOne({ email });
     if (!user) return errorResponse(res, INVALID_ACCOUNT_DETAILS, 401);
 
     const isPasswordValid = await comparePassword(password, user.password);
@@ -51,7 +50,7 @@ export const login = async (req, res) => {
       path: "/",
     });
 
-    const safeUser = _.omit(user, ["password"]);
+    const safeUser = _.omit(user.toObject(), ["password"]);
     return successResponse(res, LOGIN_SUCCESS, safeUser);
   } catch (err) {
     console.error("🚨 Login Error:", err);
@@ -109,7 +108,7 @@ export const checkLoginStatus = async (req, res) => {
 };
 
 /* ======================================================
-   🔹 FORGOT PASSWORD - Request Reset Link
+   🔹 FORGOT PASSWORD (Send Reset Link)
    ====================================================== */
 export const forgotPassword = async (req, res) => {
   try {
@@ -119,33 +118,31 @@ export const forgotPassword = async (req, res) => {
     const user = await AdminSchema.findOne({ email });
     if (!user) return errorResponse(res, "Account not found");
 
-    // 1️⃣ Generate reset token
+    // 1️⃣ Generate raw + hashed token
     const rawToken = crypto.randomBytes(32).toString("hex");
-
-    // 2️⃣ Hash before saving
     const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
 
-    // 3️⃣ Set expiry (10 minutes)
+    // 2️⃣ Expiration (10 minutes)
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // 4️⃣ Remove old reset requests for same user (optional)
+    // 3️⃣ Remove old tokens
     await ResetPasswordSchema.deleteMany({ user_id: user._id });
 
-    // 5️⃣ Save new token
+    // 4️⃣ Save new reset request
     await ResetPasswordSchema.create({
       user_id: user._id,
       reset_token: hashedToken,
       expiresAt,
     });
 
-    // 6️⃣ Build reset URL
+    // 5️⃣ Build link
     const resetLink = `${FRONTEND_URL}/reset-password/${rawToken}`;
 
-    // 7️⃣ Send email
+    // 6️⃣ Send email
     await sendMail({
       to: user.email,
       subject: "Reset Your Mecatrone Password",
-      type: "passwordReset",
+      template: "passwordReset",
       data: { resetLink },
     });
 
@@ -156,37 +153,58 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+/* ======================================================
+   🔹 VERIFY RESET TOKEN
+   ====================================================== */
+export const verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return errorResponse(res, "Token is required");
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const resetRecord = await ResetPasswordSchema.findOne({
+      reset_token: hashedToken,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!resetRecord)
+      return errorResponse(res, "Invalid or expired reset link", 400);
+
+    return successResponse(res, "Valid reset token");
+  } catch (error) {
+    console.error("🚨 Verify Reset Token Error:", error);
+    return errorResponse(res, "Invalid or expired reset link", 500);
+  }
+};
 
 /* ======================================================
-   🔹 RESET PASSWORD - After Clicking Email Link
+   🔹 RESET PASSWORD
    ====================================================== */
 export const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
+    
     if (!token || !newPassword)
       return errorResponse(res, "Token and new password are required");
 
-    // 1️⃣ Hash the token to match stored hash
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-    // 2️⃣ Find valid reset request
     const resetRecord = await ResetPasswordSchema.findOne({
       reset_token: hashedToken,
-      expiresAt: { $gt: new Date() }, // ensure not expired
+      expiresAt: { $gt: new Date() },
     });
 
     if (!resetRecord)
       return errorResponse(res, "Invalid or expired reset token", 400);
 
-    // 3️⃣ Find user
     const user = await AdminSchema.findById(resetRecord.user_id);
     if (!user) return errorResponse(res, "User not found", 404);
 
-    // 4️⃣ Hash new password and save
-    user.password = await hashPassword(newPassword);
+    // ✅ Correctly hash once (avoid double hash)
+    user.password = newPassword;
     await user.save();
 
-    // 5️⃣ Delete used token (prevent reuse)
     await ResetPasswordSchema.deleteMany({ user_id: user._id });
 
     return successResponse(res, "Password reset successful");
@@ -195,7 +213,6 @@ export const resetPassword = async (req, res) => {
     return errorResponse(res, "Password reset failed", 500);
   }
 };
-
 
 /* ======================================================
    🔹 LOGOUT

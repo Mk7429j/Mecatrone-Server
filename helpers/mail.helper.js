@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
  * @param {string} [options.template="custom"] - template name (e.g., enquiry, newsletter, passwordReset)
  * @param {Object} [options.data={}] - data for the template
  */
-export const sendMail = async ({ to, subject, template = "custom", data = {} }) => {
+export const sendMail = async ({ to, subject, template = {}, data = {} }) => {
   try {
     if (!to || !subject) throw new Error("Missing required fields: 'to' or 'subject'");
 

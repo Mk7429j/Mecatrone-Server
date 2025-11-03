@@ -4,31 +4,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-let s3;
+const { MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY, MY_AWS_REGION } = process.env;
 
-if (
-  !process.env.MY_AWS_ACCESS_KEY_ID ||
-  !process.env.MY_AWS_SECRET_ACCESS_KEY ||
-  !process.env.MY_AWS_REGION
-) {
-  console.warn("⚠️ Missing AWS credentials in .env file");
+if (!MY_AWS_ACCESS_KEY_ID || !MY_AWS_SECRET_ACCESS_KEY || !MY_AWS_REGION) {
+  throw new Error("❌ Missing AWS credentials or region in .env");
 }
 
-try {
-  s3 = new S3Client({
-    region: process.env.MY_AWS_REGION, // Example: "ap-south-1"
-    credentials: {
-      accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
-    },
-  });
+export const s3 = new S3Client({
+  region: MY_AWS_REGION,
+  credentials: {
+    accessKeyId: MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: MY_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("✅ S3 client initialized successfully");
-  }
-} catch (error) {
-  console.error("❌ Failed to initialize S3 client:", error);
-  s3 = null;
-}
-
-export { s3 };
+console.log(`✅ S3 initialized for region: ${MY_AWS_REGION}`);

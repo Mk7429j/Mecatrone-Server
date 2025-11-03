@@ -1,4 +1,3 @@
-// controllers/dashboard.controller.js
 import {
     BannerSchema,
     BlogSchema,
@@ -7,7 +6,8 @@ import {
     ProjectSchema,
     ReviewSchema,
     EnquirySchema,
-    NewsletterSchema, // ✅ added
+    NewsletterSchema,
+    AdminSchema, // ✅ Added
 } from "../models/models_import.js";
 
 import { successResponse, errorResponse } from "../helpers/response.helper.js";
@@ -22,7 +22,8 @@ export const getDashboardStats = async (req, res) => {
             projects,
             reviews,
             enquiries,
-            subscribers, // ✅ added
+            subscribers,
+            admins,
         ] = await Promise.all([
             BannerSchema.aggregate([{ $count: "total" }]),
             BlogSchema.aggregate([{ $count: "total" }]),
@@ -45,24 +46,39 @@ export const getDashboardStats = async (req, res) => {
                     },
                 },
             ]),
-            NewsletterSchema.aggregate([{ $count: "total" }]), // ✅ added
+            NewsletterSchema.aggregate([{ $count: "total" }]),
+            AdminSchema.aggregate([
+                {
+                    $group: {
+                        _id: "$role", // ✅ role field — assumes values like 'admin' | 'superadmin'
+                        count: { $sum: 1 },
+                    },
+                },
+            ]),
         ]);
 
-        // 🧮 Format review counts
+        // 🧮 Review stats
         const reviewCounts = {
-            verified: reviews.find(r => r._id === true)?.count || 0,
-            unverified: reviews.find(r => r._id === false)?.count || 0,
+            verified: reviews.find((r) => r._id === true)?.count || 0,
+            unverified: reviews.find((r) => r._id === false)?.count || 0,
             total: reviews.reduce((a, b) => a + b.count, 0),
         };
 
-        // 🧮 Format enquiry counts
+        // 🧮 Enquiry stats
         const enquiryCounts = {
-            opened: enquiries.find(e => e._id === true)?.count || 0,
-            unopened: enquiries.find(e => e._id === false)?.count || 0,
+            opened: enquiries.find((e) => e._id === true)?.count || 0,
+            unopened: enquiries.find((e) => e._id === false)?.count || 0,
             total: enquiries.reduce((a, b) => a + b.count, 0),
         };
 
-        // 🧮 Combine all stats
+        // 🧮 Admin stats
+        const adminCounts = {
+            superadmin: admins.find((a) => a._id === "superadmin")?.count || 0,
+            admin: admins.find((a) => a._id === "admin")?.count || 0,
+            total: admins.reduce((a, b) => a + b.count, 0),
+        };
+
+        // ✅ Combine all stats
         const stats = {
             banners: banners[0]?.total || 0,
             blogs: blogs[0]?.total || 0,
@@ -71,10 +87,15 @@ export const getDashboardStats = async (req, res) => {
             projects: projects[0]?.total || 0,
             reviews: reviewCounts,
             enquiries: enquiryCounts,
-            subscribers: subscribers[0]?.total || 0, // ✅ added
+            subscribers: subscribers[0]?.total || 0,
+            admins: adminCounts,
         };
 
-        return successResponse(res, "📊 Dashboard data fetched successfully", stats);
+        return successResponse(
+            res,
+            "📊 Dashboard data fetched successfully",
+            stats
+        );
     } catch (error) {
         console.error("❌ Dashboard error:", error);
         return errorResponse(res, "Failed to fetch dashboard stats", error.message);

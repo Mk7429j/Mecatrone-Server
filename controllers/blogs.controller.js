@@ -13,6 +13,8 @@ import {
 
 import { successResponse, errorResponse } from "../helpers/response.helper.js";
 import { BlogSchema } from "../models/models_import.js";
+import { s3 } from "../config/s3.config.js";
+import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
 // ===================================================
 // 🟢 ADD BLOG
@@ -66,13 +68,44 @@ export const editBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await BlogSchema.findByIdAndDelete(id);
 
-    if (!deleted) return errorResponse(res, "Blog not found", null, 404);
+    const blog = await BlogSchema.findById(id);
+    if (!blog) {
+      return res.status(404).json({ success: false, message: "Blog not found" });
+    }
 
-    return successResponse(res, BLOG_DELETED_SUCESS);
-  } catch (err) {
-    console.error("❌ Delete Blog Error:", err);
-    return errorResponse(res, BLOG_DELETED_FAILED, err);
+    // 🧩 Extract all image URLs stored in this blog
+    const imageUrls = Array.isArray(blog.images)
+      ? blog.images
+      : blog.image
+        ? [blog.image]
+        : [];
+
+    // 🧹 Delete images from S3 if they exist
+    if (imageUrls.length > 0) {
+      const keys = imageUrls
+        .map((url) => url.split(".amazonaws.com/")[1])
+        .filter(Boolean);
+
+      if (keys.length > 0) {
+        await s3.send(
+          new DeleteObjectsCommand({
+            Bucket: process.env.MY_AWS_BUCKET,
+            Delete: { Objects: keys.map((Key) => ({ Key })) },
+          })
+        );
+      }
+    }
+
+    // 🗑️ Delete blog document
+    await BlogSchema.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: BLOG_DELETED_SUCESS,
+    });
+  } catch (error) {
+    console.error("❌ Blog delete failed:", error);
+    res.status(500).json({ success: false, message: BLOG_DELETED_FAILED, error: error.message });
   }
 };

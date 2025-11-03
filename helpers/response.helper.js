@@ -45,3 +45,7 @@ export const errorResponse = (res, message = SOMETHING_WENT_WRONG, statusCode = 
 
   return res.status(statusCode).json(response);
 };
+
+
+export const asyncHandler = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
