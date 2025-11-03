@@ -1,50 +1,153 @@
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const logger = require("./utils/logger");
-const path = require("path");
-require("dotenv").config();
+// ---------------------------
+//  🌐 Mecatrone Server Entry
+// ---------------------------
 
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import compression from "compression";
+import rateLimit from "express-rate-limit";
+import { db_connection } from "./config/db.config.js";
+import logger from "./utils/logger.js";
+import Routes from "./routers/router_index.js";
+
+// ---------------------------
+//  🌱 Load environment variables
+// ---------------------------
+dotenv.config();
+
+// ---------------------------
+//  🧩 Resolve dirname
+// ---------------------------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ---------------------------
+//  ✅ Environment Sanity Check
+// ---------------------------
+if (!process.env.PORT || !process.env.MONGO_URI) {
+  console.error("❌ Missing required environment variables.");
+  process.exit(1);
+}
+
+// ---------------------------
+//  🔹 Initialize Express App
+// ---------------------------
 const app = express();
+app.set("trust proxy", 1);
 
-// Middleware
-app.use(express.json());
-app.use(cors());
-app.use(morgan("dev"));
+// ---------------------------
+//  🛡 Security & Middleware
+// ---------------------------
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // disabled for API dev testing
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
+// ✅ Rate limiting (150 requests / 15 mins)
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 150,
+    message: "Too many requests, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
+// ✅ CORS — restrict origins in production
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mecatrone.com",
+  "https://admin.mecatrone.com",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+// ✅ Body parsing & cookies
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// ✅ Logging (dev only)
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// ✅ Compression for responses
+app.use(compression());
+
+// ✅ Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Test route
+// ---------------------------
+//  🧭 Health Check
+// ---------------------------
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.status(200).json({
+    success: true,
+    message: "🚀 Mecatrone API is running smoothly...",
+    env: process.env.NODE_ENV || "development",
+  });
 });
 
-// API routes
-const Routes = require("./routers/router_index");
-app.use("/api", Routes);
+// ---------------------------
+//  ⚙️ API Routes
+// ---------------------------
+app.use("/mec-api", Routes);
 
-// Error handler
+// ---------------------------
+//  🧠 404 Handler
+// ---------------------------
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `❌ Route ${req.originalUrl} not found.`,
+  });
+});
+
+// ---------------------------
+//  ⚠️ Global Error Handler
+// ---------------------------
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
+  logger.error("Unhandled Error:", err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
 });
 
-// Start server
+// ---------------------------
+//  🔥 Start Server
+// ---------------------------
 const PORT = process.env.PORT || 5000;
-const { db_connection } = require("./config/db");
 
 db_connection()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`✅ Server running on http://localhost:${PORT}`);
+      logger.info(`✅ Server started at: http://localhost:${PORT}`);
+      logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
     });
   })
   .catch((err) => {
-    console.error("❌ Failed to connect to the database:", err);
+    logger.error("❌ Database connection failed:", err.message);
+    process.exit(1);
   });
 
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.originalUrl}`);
-  next();
-});
+export default app;
