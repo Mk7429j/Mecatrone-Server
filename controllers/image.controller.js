@@ -45,7 +45,6 @@ export const uploadImage = async (req, res) => {
         Key: fileKey,
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: "public-read",
       };
 
       await s3.send(new PutObjectCommand(params));
@@ -71,20 +70,45 @@ export const uploadImage = async (req, res) => {
 // 🗑️ Delete single or multiple images
 export const deleteImage = async (req, res) => {
   try {
-    const { urls } = req.body;
+    let { urls } = req.body;
 
-    if (!urls || urls.length === 0) {
-      return res.status(400).json({ success: false, message: "No URLs provided" });
+    // ✅ Handle single string or missing array
+    if (!urls) {
+      return res.status(400).json({
+        success: false,
+        message: "No image URLs provided in request body",
+      });
     }
 
+    if (typeof urls === "string") urls = [urls]; // convert single string to array
+
+    if (!Array.isArray(urls) || urls.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image URLs format",
+      });
+    }
+
+    // ✅ Extract S3 keys from URLs
     const keys = urls
-      .map((url) => url.split(".amazonaws.com/")[1])
-      .filter((key) => typeof key === "string" && key.trim() !== "");
+      .map((url) => {
+        try {
+          const match = url.split(".amazonaws.com/")[1];
+          return match?.trim() || null;
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     if (keys.length === 0) {
-      return res.status(400).json({ success: false, message: "Invalid URL(s)" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or malformed URL(s)",
+      });
     }
 
+    // ✅ Delete from S3 (single or multiple)
     if (keys.length === 1) {
       await s3.send(
         new DeleteObjectCommand({
@@ -101,13 +125,19 @@ export const deleteImage = async (req, res) => {
       );
     }
 
-    res.status(200).json({
+    console.log("🗑️ Deleted files:", keys);
+
+    return res.status(200).json({
       success: true,
       message: "🗑️ File(s) deleted successfully",
       deleted: keys,
     });
   } catch (error) {
     console.error("❌ Delete failed:", error);
-    res.status(500).json({ success: false, message: "Delete failed", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete file(s)",
+      error: error.message,
+    });
   }
 };

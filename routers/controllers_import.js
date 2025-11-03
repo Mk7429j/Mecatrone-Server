@@ -4,7 +4,7 @@ import { addAdmin, getAdmin, deleteAdmin, updateAdmin } from "../controllers/adm
 // Auth controllers
 import {
   login, changePassword, checkLoginStatus, logout, forgotPassword,
-  resetPassword,
+  resetPassword, verifyResetToken
 } from "../controllers/auth.controller.js";
 
 //img controllers
@@ -89,6 +89,7 @@ export {
   logout,
   forgotPassword,
   resetPassword,
+  verifyResetToken,
 
   //img
   uploadImage,

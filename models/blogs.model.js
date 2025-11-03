@@ -10,10 +10,13 @@ const blogSchema = new Schema(
       required: [true, "Blog name is required"],
       trim: true,
     },
-    blog_image: {
-      type: String,
-      required: [true, "Blog image is required"],
-      trim: true,
+    blog_images: {
+      type: [String], 
+      required: [true, "At least one blog image is required"],
+      validate: {
+        validator: (arr) => arr.length > 0,
+        message: "At least one image must be uploaded",
+      },
     },
     short_description: {
       type: String,

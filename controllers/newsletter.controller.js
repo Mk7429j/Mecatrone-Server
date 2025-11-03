@@ -15,24 +15,14 @@ export const addSubscriber = async (req, res) => {
         const exists = await NewsletterSchema.findOne({ email });
         if (exists) return errorResponse(res, "Email already subscribed");
 
-        console.log(exists, "result");
         // 🔹 3. Save to DB
         const newSubscriber = await NewsletterSchema.create({ email });
 
         // 🔹 4. Prepare mail content
         const mailOptions = {
-            from: `"Mecatrone" <${process.env.MAIL_USER}>`,
             to: email,
             subject: "🎉 Welcome to Mecatrone Newsletter!",
-            html: `
-        <div style="font-family: Arial, sans-serif; padding: 16px; background: #f9f9f9;">
-          <h2 style="color:#007bff;">Welcome to Mecatrone!</h2>
-          <p>Thank you for subscribing to our newsletter.</p>
-          <p>You’ll now receive updates about our latest projects, products, and insights.</p>
-          <hr style="margin: 20px 0;">
-          <p>Best regards,<br><b>The Mecatrone Team</b></p>
-        </div>
-      `,
+            template: "newsletter",
         };
 
         // 🔹 5. Send mail
