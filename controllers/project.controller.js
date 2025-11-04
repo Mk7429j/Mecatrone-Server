@@ -31,17 +31,17 @@ export const addProject = async (req, res) => {
       short_description,
       project_url,
       client_id,
-      works,
+      work_id,
     } = req.body;
 
-    // Validate required fields
+    // ✅ Validate required fields
     if (
       !project_name ||
       !project_image ||
       !short_description ||
       !project_url ||
       !client_id ||
-      !works
+      !work_id
     ) {
       return errorResponse(res, ALL_FIELDS_REQUIRED);
     }
@@ -50,12 +50,9 @@ export const addProject = async (req, res) => {
     const client = await ClientSchema.findById(client_id);
     if (!client) return errorResponse(res, INVALID_CLIENT_REFERENCE);
 
-    // ✅ Ensure works are stored in their collection
-    const workDocs = [];
-    for (const work of works) {
-      const newWork = await WorkSchema.create(work);
-      workDocs.push(newWork._id);
-    }
+    // ✅ Check if work exists
+    const work = await WorkSchema.findById(work_id);
+    if (!work) return errorResponse(res, "Invalid Work Reference");
 
     // ✅ Create new project
     const newProject = new ProjectSchema({
@@ -64,10 +61,7 @@ export const addProject = async (req, res) => {
       short_description,
       project_url,
       client_id,
-      client_name: client.client_name,
-      client_email: client.client_email,
-      company_name: client.company_name,
-      works: workDocs, // store work IDs here
+      work_id,
     });
 
     await newProject.save();
@@ -80,13 +74,13 @@ export const addProject = async (req, res) => {
 };
 
 // ===================================================
-// 🟢 GET ALL PROJECTS
+// 🟡 GET ALL PROJECTS
 // ===================================================
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await ProjectSchema.find()
       .populate("client_id", "client_name company_name client_email client_type")
-      .populate("works")
+      .populate("work_id", "work_name category")
       .sort({ createdAt: -1 });
 
     return successResponse(res, PROJECT_GET_SUCCESS, projects);
@@ -97,7 +91,7 @@ export const getAllProjects = async (req, res) => {
 };
 
 // ===================================================
-// 🟢 GET PROJECT BY ID
+// 🔵 GET PROJECT BY ID
 // ===================================================
 export const getProjectById = async (req, res) => {
   try {
@@ -105,7 +99,7 @@ export const getProjectById = async (req, res) => {
 
     const project = await ProjectSchema.findById(id)
       .populate("client_id", "client_name company_name client_email client_type")
-      .populate("works");
+      .populate("work_id", "work_name category");
 
     if (!project) return errorResponse(res, PAGES_NOT_FOUND);
 
@@ -117,37 +111,32 @@ export const getProjectById = async (req, res) => {
 };
 
 // ===================================================
-// 🟢 EDIT PROJECT
+// 🟠 EDIT PROJECT
 // ===================================================
 export const editProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const { client_id, work_id, ...updateData } = req.body;
 
-    // ✅ Update client info if client_id changed
-    if (updateData.client_id) {
-      const client = await ClientSchema.findById(updateData.client_id);
+    // Validate client and work if provided
+    if (client_id) {
+      const client = await ClientSchema.findById(client_id);
       if (!client) return errorResponse(res, INVALID_CLIENT_REFERENCE);
-
-      updateData.client_name = client.client_name;
-      updateData.client_email = client.client_email;
-      updateData.company_name = client.company_name;
+      updateData.client_id = client_id;
     }
 
-    // ✅ If new works provided, save them separately
-    if (updateData.works && updateData.works.length > 0) {
-      const workDocs = [];
-      for (const work of updateData.works) {
-        const newWork = await WorkSchema.create(work);
-        workDocs.push(newWork._id);
-      }
-      updateData.works = workDocs;
+    if (work_id) {
+      const work = await WorkSchema.findById(work_id);
+      if (!work) return errorResponse(res, "Invalid Work Reference");
+      updateData.work_id = work_id;
     }
 
     const updatedProject = await ProjectSchema.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    }).populate("client_id works");
+    })
+      .populate("client_id", "client_name company_name client_email client_type")
+      .populate("work_id", "work_name category");
 
     if (!updatedProject) return errorResponse(res, PAGES_NOT_FOUND);
 
@@ -159,7 +148,7 @@ export const editProject = async (req, res) => {
 };
 
 // ===================================================
-// 🟢 DELETE PROJECT
+// 🔴 DELETE PROJECT
 // ===================================================
 export const deleteProject = async (req, res) => {
   try {

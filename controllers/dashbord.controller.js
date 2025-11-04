@@ -7,11 +7,14 @@ import {
     ReviewSchema,
     EnquirySchema,
     NewsletterSchema,
-    AdminSchema, // ✅ Added
+    AdminSchema,
 } from "../models/models_import.js";
 
 import { successResponse, errorResponse } from "../helpers/response.helper.js";
 
+// ===================================================
+// 📊 DASHBOARD STATS CONTROLLER
+// ===================================================
 export const getDashboardStats = async (req, res) => {
     try {
         const [
@@ -28,7 +31,7 @@ export const getDashboardStats = async (req, res) => {
             BannerSchema.aggregate([{ $count: "total" }]),
             BlogSchema.aggregate([{ $count: "total" }]),
             ClientSchema.aggregate([{ $count: "total" }]),
-            WorkSchema.aggregate([{ $count: "total" }]),
+            WorkSchema.aggregate([{ $count: "total" }]), // ✅ Works total count
             ProjectSchema.aggregate([{ $count: "total" }]),
             ReviewSchema.aggregate([
                 {
@@ -50,7 +53,7 @@ export const getDashboardStats = async (req, res) => {
             AdminSchema.aggregate([
                 {
                     $group: {
-                        _id: "$role", // ✅ role field — assumes values like 'admin' | 'superadmin'
+                        _id: "$role", // role: 'admin' | 'superadmin'
                         count: { $sum: 1 },
                     },
                 },
@@ -83,7 +86,7 @@ export const getDashboardStats = async (req, res) => {
             banners: banners[0]?.total || 0,
             blogs: blogs[0]?.total || 0,
             clients: clients[0]?.total || 0,
-            works: works[0]?.total || 0,
+            works: works[0]?.total || 0, // ✅ Added works count properly here
             projects: projects[0]?.total || 0,
             reviews: reviewCounts,
             enquiries: enquiryCounts,
