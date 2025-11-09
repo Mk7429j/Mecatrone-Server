@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to MECATRONIX Newsletter</title>
+    <title><%= title %> - MECATRONIX</title>
     <style>
         /* Reset styles for email compatibility */
         .ReadMsgBody { width: 100%; background-color: #ffffff; }
@@ -66,7 +66,7 @@
             letter-spacing: 2px;
         }
         
-        .welcome-title {
+        .voucher-title {
             font-size: 28px;
             font-weight: 700;
             margin: 20px 0 10px;
@@ -80,17 +80,17 @@
             background: #0a0a0a;
         }
         
-        .welcome-section {
+        .voucher-section {
             text-align: center;
             margin-bottom: 30px;
         }
         
-        .welcome-icon {
+        .voucher-icon {
             font-size: 60px;
             margin-bottom: 20px;
         }
         
-        .welcome-text {
+        .voucher-text {
             font-size: 18px;
             color: #e5e5e5;
             line-height: 1.7;
@@ -100,6 +100,26 @@
         .highlight {
             color: #f59e0b;
             font-weight: 600;
+        }
+        
+        /* Images Grid */
+        .images-grid {
+            width: 100%;
+            margin: 30px 0;
+            border-spacing: 15px;
+        }
+        
+        .image-cell {
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .tech-image {
+            width: 100%;
+            max-width: 150px;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #333333;
         }
         
         .features-grid {
@@ -142,37 +162,44 @@
             opacity: 0.5;
         }
         
-        .tips-section {
+        .message-section {
             background: #1a0a0a;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             border-left: 4px solid #dc2626;
             margin: 25px 0;
         }
         
-        .tip {
-            display: table;
-            width: 100%;
-            margin-bottom: 12px;
+        .message-text {
             color: #e5e5e5;
-            font-size: 14px;
+            font-size: 16px;
+            line-height: 1.7;
+            text-align: center;
+            font-style: italic;
+            margin: 0;
         }
         
-        .tip:last-child {
-            margin-bottom: 0;
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
         }
         
-        .tip-icon {
-            display: table-cell;
-            width: 30px;
-            vertical-align: top;
-            color: #ea580c;
-            font-weight: bold;
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+            color: white;
+            padding: 18px 40px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
         }
         
-        .tip-text {
-            display: table-cell;
-            vertical-align: top;
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
         }
         
         .footer {
@@ -243,15 +270,15 @@
                 letter-spacing: 1px;
             }
             
-            .welcome-title {
+            .voucher-title {
                 font-size: 22px;
             }
             
-            .welcome-icon {
+            .voucher-icon {
                 font-size: 50px;
             }
             
-            .welcome-text {
+            .voucher-text {
                 font-size: 16px;
             }
             
@@ -264,11 +291,15 @@
                 margin: 8px auto;
                 max-width: 200px;
             }
+            
+            .tech-image {
+                max-width: 120px;
+            }
         }
         
         /* Fallback for email clients that don't support gradients */
         @media screen and (max-width: 1px) {
-            .logo, .welcome-title, .team-name {
+            .logo, .voucher-title, .team-name {
                 background: none !important;
                 -webkit-text-fill-color: initial !important;
                 color: #f59e0b !important;
@@ -278,7 +309,7 @@
                 background: #dc2626 !important;
             }
             
-            .social-link {
+            .social-link, .cta-button {
                 background: #dc2626 !important;
             }
         }
@@ -296,64 +327,77 @@
         <div class="header">
             <div class="logo">MECATRONIX</div>
             <div class="logo-subtitle">Innovation Redefined</div>
-            <div class="welcome-title">🎉 Welcome to the Future!</div>
+            <div class="voucher-title"><%= title %></div>
         </div>
         
         <div class="content">
-            <div class="welcome-section">
-                <div class="welcome-icon">🚀</div>
-                <p class="welcome-text">
-                    Thank you for subscribing to the <span class="highlight">MECATRONIX</span> newsletter! 
-                    You've just joined an elite community at the forefront of technological innovation.
+            <div class="voucher-section">
+                <div class="voucher-icon">🚀</div>
+                <p class="voucher-text">
+                    <span class="highlight">MECATRONIX</span> brings you the latest in technological innovation.
                 </p>
-                <p class="welcome-text">
-                    Get ready to receive <span class="highlight">exclusive updates</span> about our cutting-edge projects, 
-                    revolutionary products, and industry insights that will shape tomorrow.
+                
+                <% if (heading) { %>
+                <p class="voucher-text">
+                    <span class="highlight"><%= heading %></span>
                 </p>
+                <% } %>
             </div>
+            
+            <!-- Images Grid -->
+            <% if (images && images.length > 0) { %>
+            <table class="images-grid" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <% images.forEach((image, index) => { %>
+                    <td width="<%= Math.floor(100 / Math.min(images.length, 3)) %>%" class="image-cell">
+                        <img src="<%= image %>" alt="MECATRONIX Innovation <%= index + 1 %>" class="tech-image" />
+                    </td>
+                    <% }); %>
+                </tr>
+            </table>
+            <% } %>
+            
+            <!-- Message Section -->
+            <% if (message) { %>
+            <div class="message-section">
+                <p class="message-text"><%= message %></p>
+            </div>
+            <% } %>
+            
+            <div class="divider"></div>
             
             <!-- Features Grid -->
             <table class="features-grid" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                     <td width="33%" style="padding: 8px;">
                         <div class="feature">
-                            <div class="feature-icon">🔥</div>
-                            <div class="feature-title">Innovation First</div>
-                            <div class="feature-desc">Breakthrough technologies and revolutionary solutions</div>
+                            <div class="feature-icon">🚀</div>
+                            <div class="feature-title">Cutting-Edge Tech</div>
+                            <div class="feature-desc">Access our latest innovations and breakthroughs</div>
                         </div>
                     </td>
                     <td width="33%" style="padding: 8px;">
                         <div class="feature">
                             <div class="feature-icon">⚡</div>
-                            <div class="feature-title">Lightning Updates</div>
-                            <div class="feature-desc">Real-time insights into our latest developments</div>
+                            <div class="feature-title">Premium Access</div>
+                            <div class="feature-desc">Exclusive benefits for our community members</div>
                         </div>
                     </td>
                     <td width="33%" style="padding: 8px;">
                         <div class="feature">
                             <div class="feature-icon">🎯</div>
-                            <div class="feature-title">Exclusive Access</div>
-                            <div class="feature-desc">Priority information before public release</div>
+                            <div class="feature-title">Future Ready</div>
+                            <div class="feature-desc">Technology designed for tomorrow's challenges</div>
                         </div>
                     </td>
                 </tr>
             </table>
             
-            <div class="divider"></div>
-            
-            <div class="tips-section">
-                <div class="tip">
-                    <div class="tip-icon">💌</div>
-                    <div class="tip-text">Your first innovation briefing arrives in 24 hours</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-icon">🔔</div>
-                    <div class="tip-text">Check promotions tab (Gmail users) to never miss an update</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-icon">⭐</div>
-                    <div class="tip-text">Add us to your contacts for optimal delivery</div>
-                </div>
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <a href="<%= websiteUrl || '#' %>" class="cta-button" style="color: white; text-decoration: none;">
+                    Explore Our Innovations
+                </a>
             </div>
         </div>
         
@@ -364,13 +408,14 @@
             </div>
             
             <div class="social-links">
-                <a href="#" class="social-link" style="color: white; text-decoration: none;">Explore Our Universe</a>
-                <a href="#" class="social-link" style="color: white; text-decoration: none;">Join Innovation Hub</a>
-                <a href="#" class="social-link" style="color: white; text-decoration: none;">Follow the Revolution</a>
+                <a href="#" class="social-link" style="color: white; text-decoration: none;">Latest Tech</a>
+                <a href="#" class="social-link" style="color: white; text-decoration: none;">Innovation Hub</a>
+                <a href="#" class="social-link" style="color: white; text-decoration: none;">Join Community</a>
             </div>
             
             <div class="copyright">
-                © 2024 MECATRONIX. Redefining technological boundaries.
+                © 2024 MECATRONIX. Redefining technological boundaries.<br>
+                <a href="<%= unsubscribeUrl || '#' %>" style="color: #737373;">Unsubscribe</a>
             </div>
         </div>
     </div>

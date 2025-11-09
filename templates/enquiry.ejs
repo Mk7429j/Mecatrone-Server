@@ -1,11 +1,412 @@
-<div style="font-family: Arial, sans-serif; padding: 16px;">
-  <h3>📩 New Enquiry Received</h3>
-  <p><b>Name:</b> <%= name || "N/A" %></p>
-  <p><b>Email:</b> <%= email || "N/A" %></p>
-  <p><b>Phone:</b> <%= phone || "N/A" %></p>
-  <p><b>Company:</b> <%= company || "N/A" %></p>
-  <p><b>Message:</b></p>
-  <p style="background:#f4f4f4;padding:10px;border-radius:8px;">
-    <%= message || "No message provided" %>
-  </p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Enquiry Received</title>
+    <style>
+        /* Reset styles for email compatibility */
+        .ReadMsgBody { width: 100%; background-color: #ffffff; }
+        .ExternalClass { width: 100%; background-color: #ffffff; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+        body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table { border-spacing: 0; }
+        table td { border-collapse: collapse; }
+        img { -ms-interpolation-mode: bicubic; display: block; }
+        
+        /* Main styles */
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background: #0a0a0a;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .email-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #0a0a0a;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(220, 38, 38, 0.15);
+            border: 1px solid #333333;
+        }
+        
+        .header-gradient {
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626, #ea580c, #f59e0b);
+            width: 100%;
+        }
+        
+        .header {
+            background: #000000;
+            padding: 40px 30px 30px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid #333333;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #dc2626, #ea580c, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        
+        .logo-subtitle {
+            font-size: 14px;
+            color: #ea580c;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-icon {
+            font-size: 60px;
+            margin: 15px 0;
+        }
+        
+        .content {
+            padding: 40px 30px;
+            background: #0a0a0a;
+        }
+        
+        .alert-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            background: linear-gradient(45deg, #ffffff, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        .info-grid {
+            width: 100%;
+            margin-bottom: 25px;
+            border-spacing: 15px;
+        }
+        
+        .info-card {
+            background: #1a0a0a;
+            border: 1px solid #444444;
+            border-left: 4px solid #dc2626;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #ea580c;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #e5e5e5;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        
+        .na-value {
+            color: #737373;
+            font-style: italic;
+        }
+        
+        .message-section {
+            margin: 30px 0;
+        }
+        
+        .message-header {
+            color: #f59e0b;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .message-box {
+            background: #1a0a0a;
+            border: 1px solid #444444;
+            border-left: 4px solid #dc2626;
+            border-radius: 10px;
+            padding: 25px;
+            position: relative;
+        }
+        
+        .message-content {
+            font-size: 16px;
+            color: #d4d4d4;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .no-message {
+            color: #737373;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .priority-section {
+            background: #1a0a0a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333333;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .priority-header {
+            color: #f59e0b;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .priority-text {
+            color: #a3a3a3;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .timestamp {
+            background: #1a0a0a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #444444;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .timestamp span {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dc2626, #ea580c, #f59e0b, transparent);
+            margin: 30px 0;
+            opacity: 0.4;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: #000000;
+            border-top: 1px solid #333333;
+        }
+        
+        .signature {
+            font-size: 18px;
+            color: #e5e5e5;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        
+        .team-name {
+            font-weight: 800;
+            background: linear-gradient(45deg, #dc2626, #ea580c, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 20px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+            color: #737373;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-wrapper {
+                border-radius: 15px;
+            }
+            
+            .header, .content, .footer {
+                padding: 25px 20px;
+            }
+            
+            .logo {
+                font-size: 28px;
+            }
+            
+            .logo-subtitle {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+            
+            .alert-icon {
+                font-size: 50px;
+            }
+            
+            .alert-title {
+                font-size: 20px;
+            }
+            
+            .info-card {
+                padding: 15px;
+            }
+            
+            .message-box {
+                padding: 20px 15px;
+            }
+            
+            .priority-section {
+                padding: 15px;
+            }
+            
+            .timestamp {
+                padding: 12px 15px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Fallback for email clients that don't support gradients */
+        @media screen and (max-width: 1px) {
+            .logo, .alert-title, .team-name {
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+                color: #f59e0b !important;
+            }
+            
+            .header-gradient {
+                background: #dc2626 !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: Arial, Helvetica, sans-serif;">
+    <!--[if mso]>
+    <div style="background: #0a0a0a; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>
+    <![endif]-->
+    
+    <div class="email-wrapper">
+        <div class="header-gradient"></div>
+        
+        <div class="header">
+            <div class="logo">MECATRONIX</div>
+            <div class="logo-subtitle">Innovation Redefined</div>
+            <div class="alert-icon">🚨</div>
+        </div>
+        
+        <div class="content">
+            <div class="alert-title">
+                📩 NEW ENQUIRY RECEIVED
+            </div>
+            
+            <!-- Info Grid -->
+            <table class="info-grid" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td width="50%" style="padding: 8px;">
+                        <div class="info-card">
+                            <div class="info-label">👤 NAME</div>
+                            <div class="info-value {{#unless name}}na-value{{/unless}}">
+                                {{name}} {{#unless name}}N/A{{/unless}}
+                            </div>
+                        </div>
+                    </td>
+                    <td width="50%" style="padding: 8px;">
+                        <div class="info-card">
+                            <div class="info-label">📧 EMAIL</div>
+                            <div class="info-value {{#unless email}}na-value{{/unless}}">
+                                {{email}} {{#unless email}}N/A{{/unless}}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%" style="padding: 8px;">
+                        <div class="info-card">
+                            <div class="info-label">📞 PHONE</div>
+                            <div class="info-value {{#unless phone}}na-value{{/unless}}">
+                                {{phone}} {{#unless phone}}N/A{{/unless}}
+                            </div>
+                        </div>
+                    </td>
+                    <td width="50%" style="padding: 8px;">
+                        <div class="info-card">
+                            <div class="info-label">🏢 COMPANY</div>
+                            <div class="info-value {{#unless company}}na-value{{/unless}}">
+                                {{company}} {{#unless company}}N/A{{/unless}}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="message-section">
+                <div class="message-header">
+                    💬 MESSAGE
+                </div>
+                
+                <div class="message-box">
+                    {{#if message}}
+                        <div class="message-content">{{message}}</div>
+                    {{else}}
+                        <div class="no-message">No message provided</div>
+                    {{/if}}
+                </div>
+            </div>
+            
+            <div class="priority-section">
+                <div class="priority-header">
+                    🎯 PRIORITY ENQUIRY
+                </div>
+                <p class="priority-text">
+                    This enquiry requires immediate attention. Please respond within 24 hours to ensure excellent customer service.
+                </p>
+            </div>
+            
+            <div class="timestamp">
+                ⏰ <span>Received:</span> {{timestamp}} • 🆔 <span>Reference:</span> #{{enquiryId}}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p style="text-align: center; color: #a3a3a3; font-size: 14px; line-height: 1.6;">
+                This enquiry was automatically generated from the MECATRONIX contact form.<br>
+                Please log into the admin dashboard to manage this enquiry.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="signature">
+                Automated Notification<br>
+                <span class="team-name">MECATRONIX Admin System</span>
+            </div>
+            
+            <div class="contact-info">
+                🌐 www.mecatronix.com<br>
+                📧 enquiries@mecatronix.com<br>
+                📞 +1 (555) 123-INNOVATE
+            </div>
+        </div>
+    </div>
+    
+    <!--[if mso]>
+    </td></tr></table>
+    </div>
+    <![endif]-->
+</body>
+</html>

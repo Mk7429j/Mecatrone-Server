@@ -1,5 +1,5 @@
 // ---------------------------
-//  🌐 Mecatrone Server Entry
+//  🌐 Mecatronix Server Entry
 // ---------------------------
 
 import express from "express";
@@ -75,8 +75,8 @@ app.use(
 // ✅ CORS — restrict origins in production
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://mecatrone.com",
-  "https://admin.mecatrone.com",
+  "https://Mecatronix.com",
+  "https://admin.Mecatronix.com",
 ];
 
 app.use(
@@ -112,7 +112,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "🚀 Mecatrone API is running smoothly...",
+    message: "🚀 Mecatronix API is running smoothly...",
     env: process.env.NODE_ENV || "development",
   });
 });
@@ -133,17 +133,17 @@ app.use((req, res) => {
 });
 
 // ---------------------------
-//  ⚠️ Global Error Handler
+// 🧩 Handle Invalid JSON (Bad Body)
 // ---------------------------
 app.use((err, req, res, next) => {
-  console.error("🔥 Unhandled Error:");
-  console.error(err.stack || err);
-
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-  });
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    console.error("❌ Invalid JSON received:", err.message);
+    return res.status(400).json({
+      success: false,
+      message: "Invalid JSON format in request body.",
+    });
+  }
+  next(err);
 });
 
 // ---------------------------
