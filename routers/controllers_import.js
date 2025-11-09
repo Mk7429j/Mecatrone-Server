@@ -1,5 +1,5 @@
 // Admin controllers
-import { addAdmin, getAdmin, deleteAdmin, updateAdmin } from "../controllers/admin.controller.js";
+import { addAdmin, getAdmin, deleteAdmin, getAllAdmin, updateAdmin } from "../controllers/admin.controller.js";
 
 // Auth controllers
 import {
@@ -74,11 +74,19 @@ import {
   deleteSubscribers
 } from "../controllers/newsletter.controller.js";
 
+import {
+  addVoucher,
+  getAllVouchers,
+  getVoucherById,
+  deleteVoucher
+} from "../controllers/voucher.controller.js"
+
 // Named exports
 export {
   // Admin
   addAdmin,
   getAdmin,
+  getAllAdmin,
   deleteAdmin,
   updateAdmin,
 
@@ -149,4 +157,10 @@ export {
   getEnquiryById,
   editEnquiry,
   deleteEnquiry,
+
+  //voucher
+  addVoucher,
+  getAllVouchers,
+  getVoucherById,
+  deleteVoucher,
 };

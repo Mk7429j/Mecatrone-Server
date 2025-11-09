@@ -10,5 +10,6 @@ import { BannerSchema } from "./banners.model.js";
 import { EnquirySchema } from "./enquiry.model.js";
 import { NewsletterSchema } from "./newsletter.model.js";
 import { ResetPasswordSchema } from "./resetpassword.model.js";
+import { VoucherSchema } from "./voucher.model.js";
 
-export { AdminSchema, BlogSchema, ProjectSchema, ClientSchema, ReviewSchema, WorkSchema, BannerSchema, EnquirySchema, NewsletterSchema, ResetPasswordSchema };
+export { AdminSchema, BlogSchema, ProjectSchema, ClientSchema, ReviewSchema, WorkSchema, BannerSchema, EnquirySchema, NewsletterSchema, ResetPasswordSchema, VoucherSchema };

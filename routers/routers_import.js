@@ -10,5 +10,6 @@ import banner_router from "./banner.routes.js";
 import enquiry_router from "./enquiry.routes.js";
 import dash_router from "./dashbord.routes.js";
 import news_router from "./newsletter.routes.js";
+import voucher_router from "./voucher.routes.js";
 
-export { admin_routers, auth_routes, img_router, blogs_router, client_router, review_router, project_router, works_router, banner_router, enquiry_router, dash_router, news_router }; 
+export { admin_routers, auth_routes, img_router, blogs_router, client_router, review_router, project_router, works_router, banner_router, enquiry_router, dash_router, news_router, voucher_router }; 

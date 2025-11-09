@@ -1,9 +1,12 @@
 // models/admin.model.js
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 
 const adminSchema = new mongoose.Schema(
   {
+    img: {
+      type: String,
+      trim: true,
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -42,7 +45,7 @@ const adminSchema = new mongoose.Schema(
       transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
-        delete ret.password; // remove password automatically
+        delete ret.password; // remove password from JSON responses
       },
     },
   }
@@ -51,14 +54,6 @@ const adminSchema = new mongoose.Schema(
 // ✅ Virtual ID field
 adminSchema.virtual("id").get(function () {
   return this._id.toHexString();
-});
-
-// ✅ Optional: Auto-hash password before saving
-adminSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const saltRounds = 12;
-  this.password = await bcrypt.hash(this.password, saltRounds);
-  next();
 });
 
 export const AdminSchema = mongoose.model("Admin", adminSchema);

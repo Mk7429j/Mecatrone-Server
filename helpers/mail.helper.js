@@ -28,7 +28,7 @@ export const sendMail = async ({ to, subject, template = {}, data = {} }) => {
 
     // ✉️ Send the mail
     const info = await transporter.sendMail({
-      from: `"Mecatrone" <${process.env.MAIL_USER}>`,
+      from: `"Mecatronix" <${process.env.MAIL_USER}>`,
       to,
       subject,
       html,

@@ -21,7 +21,7 @@ import {
 } from "../helpers/message.helper.js";
 import { sendMail } from "../helpers/mail.helper.js";
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://mecatrone.com";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://Mecatronix.com";
 
 /* ======================================================
    🔹 LOGIN
@@ -29,6 +29,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "https://mecatrone.com";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password)
       return errorResponse(res, "Email and password are required", 400);
 
@@ -141,7 +142,7 @@ export const forgotPassword = async (req, res) => {
     // 6️⃣ Send email
     await sendMail({
       to: user.email,
-      subject: "Reset Your Mecatrone Password",
+      subject: "Reset Your Mecatronix Password",
       template: "passwordReset",
       data: { resetLink },
     });
@@ -184,7 +185,7 @@ export const verifyResetToken = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
-    
+
     if (!token || !newPassword)
       return errorResponse(res, "Token and new password are required");
 
@@ -201,11 +202,19 @@ export const resetPassword = async (req, res) => {
     const user = await AdminSchema.findById(resetRecord.user_id);
     if (!user) return errorResponse(res, "User not found", 404);
 
-    // ✅ Correctly hash once (avoid double hash)
-    user.password = newPassword;
+    // ✅ Encrypt password
+    const hashedPassword = await hashPassword(newPassword);
+    user.password = hashedPassword;
     await user.save();
 
     await ResetPasswordSchema.deleteMany({ user_id: user._id });
+
+    // 6️⃣ Send email
+    await sendMail({
+      to: user.email,
+      subject: "Password reset successful",
+      template: "passwordSuccess",
+    });
 
     return successResponse(res, "Password reset successful");
   } catch (error) {

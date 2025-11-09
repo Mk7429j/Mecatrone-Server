@@ -16,13 +16,14 @@ import {
   ADMIN_DELETED_FAILED,
   ADMIN_ACCOUNT_ALREADY_EXISTS,
 } from "../helpers/message.helper.js";
+import { sendMail } from "../helpers/mail.helper.js";
 
 /* ======================================================
    🔹 ADD NEW ADMIN
    ====================================================== */
 export const addAdmin = async (req, res) => {
   try {
-    const { email, password, name, role, phone } = req.body;
+    const { email, img, password, name, role, phone } = req.body;
 
     // ✅ Validate required fields
     if (!email?.trim() || !password?.trim() || !name?.trim()) {
@@ -35,12 +36,28 @@ export const addAdmin = async (req, res) => {
       return errorResponse(res, ADMIN_ACCOUNT_ALREADY_EXISTS, 409);
     }
 
+    // ✅ Send credentials to new admin via email
+    await sendMail({
+      to: email,
+      subject: "🎉 Your Admin Account Has Been Created",
+      template: "newAdmin", // 👇 custom email template
+      data: {
+        name,
+        email,
+        phone,
+        password, // 👈 plain password only for the first-time login email
+        role: role || "admin",
+        loginUrl: `${process.env.FRONTEND_URL || "https://Admin.mecatronix.com"}/login`,
+      },
+    });
+
     // ✅ Encrypt password
     const hashedPassword = await hashPassword(password);
 
     // ✅ Create and save new admin
     const newAdmin = new AdminSchema({
       email,
+      img,
       password: hashedPassword,
       name: name.trim(),
       role: role || "admin",
@@ -80,6 +97,24 @@ export const getAdmin = async (req, res) => {
   }
 };
 
+export const getAllAdmin = async (req, res) => {
+  try {
+    // Find all admins where role is not "superadmin"
+    const admins = await AdminSchema.find({ role: { $ne: "superadmin" } })
+      .select("-password");
+
+    if (!admins || admins.length === 0) {
+      return errorResponse(res, "No admins found.", 404);
+    }
+
+    return successResponse(res, "Admins retrieved successfully.", admins);
+  } catch (error) {
+    console.error("🚨 getAllAdmin Error:", error);
+    return errorResponse(res, "Failed to get admins.", 500);
+  }
+};
+
+
 /* ======================================================
    🔹 UPDATE ADMIN DETAILS
    ====================================================== */
@@ -88,20 +123,44 @@ export const updateAdmin = async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
 
+    // ✅ Validate ID
     if (!id) return errorResponse(res, "Admin ID is required.", 400);
 
-    // ✅ Securely hash password if updating it
-    if (updateData.password) {
+    // ✅ Fetch the current admin data
+    const admin = await AdminSchema.findById(id);
+    if (!admin) return errorResponse(res, "Admin not found.", 404);
+
+    let newPasswordPlain = null;
+
+    // ✅ Securely hash password if it's being updated
+    if (updateData.password?.trim()) {
+      newPasswordPlain = updateData.password; // Save plain password for email
       updateData.password = await hashPassword(updateData.password);
     }
 
+    // ✅ Update admin in DB
     const updatedAdmin = await AdminSchema.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     }).select("-password");
 
-    if (!updatedAdmin) {
-      return errorResponse(res, "Admin not found.", 404);
+    // ✅ Send password update email only if password was changed
+    if (newPasswordPlain) {
+      try {
+        await sendMail({
+          to: updatedAdmin.email,
+          subject: "🔐 Your Admin Password Has Been Updated",
+          template: "passwordUpdated", // custom email template
+          data: {
+            name: updatedAdmin.name,
+            email: updatedAdmin.email,
+            password: newPasswordPlain,
+            loginUrl: `${process.env.FRONTEND_URL || "https://Admin.mecatronix.com"}/login`,
+          },
+        });
+      } catch (mailError) {
+        console.error("⚠️ Password update email failed:", mailError.message);
+      }
     }
 
     return successResponse(res, ADMIN_UPDATED_SUCCESS, updatedAdmin);
@@ -120,11 +179,28 @@ export const deleteAdmin = async (req, res) => {
 
     if (!id) return errorResponse(res, "Admin ID is required.", 400);
 
-    const deletedAdmin = await AdminSchema.findByIdAndDelete(id);
-
-    if (!deletedAdmin) {
+    // ✅ Find the admin first (we need their email & name before deleting)
+    const admin = await AdminSchema.findById(id);
+    if (!admin) {
       return errorResponse(res, "Admin not found.", 404);
     }
+
+    // ✅ Delete admin
+    await AdminSchema.findByIdAndDelete(id);
+
+    // 📩 Send deletion notification email
+    await sendMail({
+      to: admin.email,
+      subject: "🗑️ Admin Account Deleted - Mecatronix",
+      template: "adminDeleted",
+      data: {
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        supportEmail: process.env.MAIL_USER,
+        contactUrl: `${process.env.FRONTEND_URL}/contact`,
+      },
+    });
 
     return successResponse(res, ADMIN_DELETED_SUCCESS);
   } catch (error) {

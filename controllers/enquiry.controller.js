@@ -46,7 +46,7 @@ export const addEnquiry = async (req, res) => {
 
         await sendMail({
             to: email,
-            subject: "Thanks for contacting Mecatrone!",
+            subject: "Thanks for contacting Mecatronix!",
             template: "enquiryUser", // optional user template (if you create it)
             data: { name, message },
         });

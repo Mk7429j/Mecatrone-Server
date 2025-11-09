@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to MECATRONIX Admin Team</title>
+    <style>
+        /* Reset styles for email compatibility */
+        .ReadMsgBody { width: 100%; background-color: #ffffff; }
+        .ExternalClass { width: 100%; background-color: #ffffff; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+        body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table { border-spacing: 0; }
+        table td { border-collapse: collapse; }
+        img { -ms-interpolation-mode: bicubic; display: block; }
+        
+        /* Main styles */
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #2d1a1a 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .email-wrapper {
+            max-width: 650px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        .header-gradient {
+            height: 6px;
+            background: linear-gradient(90deg, #dc2626, #ea580c, #f59e0b, #eab308);
+            width: 100%;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #1a0a0a 100%);
+            padding: 50px 40px 40px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #dc2626, #ea580c, #f59e0b, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 8px 16px rgba(220, 38, 38, 0.4);
+            letter-spacing: -1.5px;
+        }
+        
+        .logo-subtitle {
+            font-size: 16px;
+            color: #f59e0b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+        }
+        
+        .welcome-icon {
+            font-size: 80px;
+            margin: 25px 0;
+            filter: drop-shadow(0 6px 12px rgba(220, 38, 38, 0.5));
+        }
+        
+        .content {
+            padding: 50px 40px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ffffff, #f59e0b, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        .message-text {
+            font-size: 18px;
+            color: #e5e5e5;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 400;
+        }
+        
+        .highlight {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+        
+        .credentials-section {
+            background: linear-gradient(135deg, rgba(26, 10, 10, 0.8), rgba(42, 26, 26, 0.6));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 35px 0;
+            text-align: center;
+        }
+        
+        .credentials-grid {
+            display: table;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            border-spacing: 0;
+        }
+        
+        .credential-item {
+            display: table-row;
+        }
+        
+        .credential-label, .credential-value {
+            display: table-cell;
+            padding: 18px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .credential-label {
+            color: #ea580c;
+            font-weight: 700;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        
+        .credential-value {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: right;
+        }
+        
+        .role-badge {
+            background: linear-gradient(45deg, #dc2626, #ea580c);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+        
+        .password-badge {
+            background: linear-gradient(45deg, #059669, #10b981);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+        
+        .login-section {
+            background: linear-gradient(135deg, rgba(26, 10, 10, 0.8), rgba(42, 26, 26, 0.6));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 35px 0;
+            text-align: center;
+        }
+        
+        .login-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #dc2626, #ea580c, #f59e0b);
+            color: white;
+            text-decoration: none;
+            padding: 20px 50px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 12px 30px rgba(220, 38, 38, 0.4);
+            border: none;
+            cursor: pointer;
+            margin: 15px 0;
+        }
+        
+        .link-alternative {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .link-text {
+            font-size: 14px;
+            color: #a3a3a3;
+            word-break: break-all;
+            background: rgba(26, 10, 10, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .steps-section {
+            background: linear-gradient(135deg, rgba(26, 10, 10, 0.8), rgba(42, 26, 26, 0.6));
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin: 30px 0;
+        }
+        
+        .steps-title {
+            text-align: center;
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .steps-grid {
+            display: table;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            border-spacing: 0;
+        }
+        
+        .step-item {
+            display: table-row;
+        }
+        
+        .step-number, .step-text {
+            display: table-cell;
+            padding: 15px;
+            vertical-align: middle;
+        }
+        
+        .step-number {
+            background: linear-gradient(45deg, #dc2626, #ea580c);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: 800;
+            font-size: 16px;
+        }
+        
+        .step-text {
+            color: #e5e5e5;
+            font-size: 16px;
+            font-weight: 500;
+            padding-left: 20px;
+        }
+        
+        .security-notice {
+            background: linear-gradient(135deg, rgba(26, 10, 10, 0.8), rgba(42, 26, 26, 0.6));
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin: 30px 0;
+            border-left: 6px solid #dc2626;
+        }
+        
+        .security-header {
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .security-text {
+            color: #d4d4d4;
+            line-height: 1.7;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #dc2626, #ea580c, #f59e0b, transparent);
+            margin: 40px 0;
+            opacity: 0.5;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #000000, #1a0a0a);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .signature {
+            font-size: 20px;
+            color: #e5e5e5;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        
+        .team-name {
+            font-weight: 800;
+            background: linear-gradient(45deg, #dc2626, #ea580c, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+        }
+        
+        .contact-info {
+            margin-top: 25px;
+            color: #a3a3a3;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-wrapper {
+                border-radius: 16px;
+            }
+            
+            .header, .content, .footer {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 32px;
+            }
+            
+            .logo-subtitle {
+                font-size: 14px;
+                letter-spacing: 3px;
+            }
+            
+            .welcome-icon {
+                font-size: 60px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .message-text {
+                font-size: 16px;
+            }
+            
+            .credentials-section, .login-section, .steps-section, .security-notice {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+            
+            .login-button {
+                padding: 18px 35px;
+                font-size: 16px;
+                display: block;
+                margin: 15px auto;
+            }
+            
+            .credential-label, .credential-value {
+                display: block;
+                text-align: center;
+                padding: 12px 15px;
+            }
+            
+            .credentials-grid {
+                display: block;
+            }
+            
+            .credential-item {
+                display: block;
+                margin-bottom: 15px;
+            }
+            
+            .steps-grid {
+                display: block;
+            }
+            
+            .step-item {
+                display: block;
+                margin-bottom: 15px;
+            }
+            
+            .step-number, .step-text {
+                display: block;
+                text-align: center;
+                padding: 10px;
+            }
+            
+            .step-number {
+                margin: 0 auto 10px auto;
+            }
+        }
+        
+        /* Fallback for email clients that don't support gradients */
+        @media screen and (max-width: 1px) {
+            .logo, .title, .team-name {
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+                color: #f59e0b !important;
+            }
+            
+            .header-gradient {
+                background: #dc2626 !important;
+            }
+            
+            .role-badge, .password-badge, .login-button {
+                background: #dc2626 !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: Arial, Helvetica, sans-serif;">
+    <!--[if mso]>
+    <div style="background: #0a0a0a; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>
+    <![endif]-->
+    
+    <div class="email-wrapper">
+        <div class="header-gradient"></div>
+        
+        <div class="header">
+            <div class="logo">MECATRONIX</div>
+            <div class="logo-subtitle">Admin Portal</div>
+            <div class="welcome-icon">🎊</div>
+        </div>
+        
+        <div class="content">
+            <div class="title">
+                👋 Welcome, <%= name %>!
+            </div>
+            
+            <p class="message-text">
+                Your new admin account has been created successfully at <span class="highlight">MECATRONIX</span>. 
+                Get ready to manage our platform with powerful tools and insights.
+            </p>
+            
+            <div class="credentials-section">
+                <p class="message-text" style="margin-bottom: 25px;">
+                    🔐 Your account has been configured with secure credentials
+                </p>
+                
+                <div class="credentials-grid">
+                    <div class="credential-item">
+                        <div class="credential-label">📧 Email Address</div>
+                        <div class="credential-value"><%= email %></div>
+                    </div>
+                    <div class="credential-item">
+                        <div class="credential-label">🔐 Password</div>
+                        <div class="credential-value">
+                            <span class="password-badge"><%= password %></span>
+                        </div>
+                    </div>
+                    <div class="credential-item">
+                        <div class="credential-label">🎯 Access Level</div>
+                        <div class="credential-value">
+                            <span class="role-badge <%= role === 'superadmin' ? 'superadmin' : '' %>">
+                                <%= role %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="login-section">
+                <p class="message-text" style="margin-bottom: 30px;">
+                    Ready to access your admin dashboard?
+                </p>
+                
+                <a href="<%= loginUrl %>" class="login-button" style="color: white; text-decoration: none;">
+                    🚀 Access Admin Panel
+                </a>
+            </div>
+            
+            <div class="link-alternative">
+                <div class="message-text" style="font-size: 16px; margin-bottom: 15px;">
+                    Or copy and paste this link in your browser:
+                </div>
+                <div class="link-text">
+                    <%= loginUrl %>
+                </div>
+            </div>
+            
+            <div class="steps-section">
+                <div class="steps-title">
+                    📋 Quick Start Guide
+                </div>
+                <div class="steps-grid">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Login using your credentials above</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Change your password immediately for security</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Explore the admin dashboard features</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Review your permissions and access levels</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="security-notice">
+                <div class="security-header">🔒 Security First Approach</div>
+                <p class="security-text">
+                    For maximum security, please change your password immediately after your first login. 
+                    Consider enabling two-factor authentication for enhanced account protection. Never share 
+                    your credentials with anyone.
+                </p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p style="text-align: center; color: #a3a3a3; font-size: 14px; line-height: 1.7;">
+                This is an automated welcome message from the MECATRONIX Admin System.<br>
+                Please keep your login credentials secure and confidential at all times.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="signature">
+                Welcome to the Team,<br>
+                <span class="team-name">MECATRONIX Admin Team</span>
+            </div>
+            
+            <div class="contact-info">
+                🌐 www.mecatronix.com<br>
+                📧 admin@mecatronix.com<br>
+                🔒 Secured by MECATRONIX
+            </div>
+        </div>
+    </div>
+    
+    <!--[if mso]>
+    </td></tr></table>
+    </div>
+    <![endif]-->
+</body>
+</html>

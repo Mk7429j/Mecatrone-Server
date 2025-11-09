@@ -21,7 +21,7 @@ export const addSubscriber = async (req, res) => {
         // 🔹 4. Prepare mail content
         const mailOptions = {
             to: email,
-            subject: "🎉 Welcome to Mecatrone Newsletter!",
+            subject: "🎉 Welcome to Mecatronix Newsletter!",
             template: "newsletter",
         };
 
