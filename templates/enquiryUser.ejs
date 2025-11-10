@@ -115,6 +115,13 @@
             font-style: italic;
         }
         
+        .no-message {
+            color: #737373;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
         .status-section {
             background: #1a0a0a;
             padding: 20px;
@@ -263,7 +270,7 @@
         
         <div class="content">
             <div class="greeting">
-                Hi <span style="color: #ea580c; font-weight: 700;">{{name}}</span>,
+                Hi <span style="color: #ea580c; font-weight: 700;"><%= typeof name !== 'undefined' && name ? name : 'Valued Customer' %></span>,
             </div>
             
             <p class="message-text">
@@ -275,9 +282,11 @@
             </p>
             
             <div class="enquiry-box">
-                <div class="enquiry-content">
-                    "{{message}}"
-                </div>
+                <% if (typeof message !== 'undefined' && message) { %>
+                    <div class="enquiry-content">"<%= message %>"</div>
+                <% } else { %>
+                    <div class="no-message">No message provided with this enquiry</div>
+                <% } %>
             </div>
             
             <div class="status-section">
@@ -291,6 +300,9 @@
             
             <div class="response-time">
                 💡 <span>Expected Response Time:</span> 24-48 hours during business days
+                <% if (typeof enquiryId !== 'undefined' && enquiryId) { %>
+                    <br>📋 <span>Reference ID:</span> #<%= enquiryId %>
+                <% } %>
             </div>
             
             <div class="divider"></div>
