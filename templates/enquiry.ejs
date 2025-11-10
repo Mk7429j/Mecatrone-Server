@@ -321,16 +321,16 @@
                     <td width="50%" style="padding: 8px;">
                         <div class="info-card">
                             <div class="info-label">👤 NAME</div>
-                            <div class="info-value {{#unless name}}na-value{{/unless}}">
-                                {{name}} {{#unless name}}N/A{{/unless}}
+                            <div class="info-value <%= typeof name !== 'undefined' && name ? '' : 'na-value' %>">
+                                <%= typeof name !== 'undefined' && name ? name : 'N/A' %>
                             </div>
                         </div>
                     </td>
                     <td width="50%" style="padding: 8px;">
                         <div class="info-card">
                             <div class="info-label">📧 EMAIL</div>
-                            <div class="info-value {{#unless email}}na-value{{/unless}}">
-                                {{email}} {{#unless email}}N/A{{/unless}}
+                            <div class="info-value <%= typeof email !== 'undefined' && email ? '' : 'na-value' %>">
+                                <%= typeof email !== 'undefined' && email ? email : 'N/A' %>
                             </div>
                         </div>
                     </td>
@@ -339,16 +339,16 @@
                     <td width="50%" style="padding: 8px;">
                         <div class="info-card">
                             <div class="info-label">📞 PHONE</div>
-                            <div class="info-value {{#unless phone}}na-value{{/unless}}">
-                                {{phone}} {{#unless phone}}N/A{{/unless}}
+                            <div class="info-value <%= typeof phone !== 'undefined' && phone ? '' : 'na-value' %>">
+                                <%= typeof phone !== 'undefined' && phone ? phone : 'N/A' %>
                             </div>
                         </div>
                     </td>
                     <td width="50%" style="padding: 8px;">
                         <div class="info-card">
                             <div class="info-label">🏢 COMPANY</div>
-                            <div class="info-value {{#unless company}}na-value{{/unless}}">
-                                {{company}} {{#unless company}}N/A{{/unless}}
+                            <div class="info-value <%= typeof company !== 'undefined' && company ? '' : 'na-value' %>">
+                                <%= typeof company !== 'undefined' && company ? company : 'N/A' %>
                             </div>
                         </div>
                     </td>
@@ -361,11 +361,11 @@
                 </div>
                 
                 <div class="message-box">
-                    {{#if message}}
-                        <div class="message-content">{{message}}</div>
-                    {{else}}
+                    <% if (typeof message !== 'undefined' && message) { %>
+                        <div class="message-content"><%= message %></div>
+                    <% } else { %>
                         <div class="no-message">No message provided</div>
-                    {{/if}}
+                    <% } %>
                 </div>
             </div>
             
@@ -379,7 +379,7 @@
             </div>
             
             <div class="timestamp">
-                ⏰ <span>Received:</span> {{timestamp}} • 🆔 <span>Reference:</span> #{{enquiryId}}
+                ⏰ <span>Received:</span> <%= typeof timestamp !== 'undefined' ? timestamp : new Date().toLocaleString() %> • 🆔 <span>Reference:</span> #<%= typeof enquiryId !== 'undefined' ? enquiryId : 'REF-' + Date.now() %>
             </div>
             
             <div class="divider"></div>
